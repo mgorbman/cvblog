@@ -18,8 +18,9 @@ root.render(
   <BrowserRouter>
   <Routes>
       <Route path="/" element={<Homepage/>} />
-      <Route path="CV" element={<CV/>} />
-      <Route path="Blog" element={<Blog/>} />
+      <Route path="cv" element={<CV/>} />
+      <Route path="blog" element={<Blog/>} />
+      <Route path="blog/:title" element={<Blog/>} />
     </Routes>
     <App />
   </BrowserRouter>
