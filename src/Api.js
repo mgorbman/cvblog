@@ -1,7 +1,7 @@
-const getPostByURL = (url) => {
+const getPostByURL = (url, callback) => {
     fetch(`${process.env.REACT_APP_X}/posts/` + url)
         .then((response) => response.json())
-        .then((json) => console.log(json))
+        .then((x) => callback(x))
 }
 
 export { getPostByURL }
