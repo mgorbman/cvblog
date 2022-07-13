@@ -4,4 +4,10 @@ const getPostByURL = (url, callback) => {
         .then((x) => callback(x))
 }
 
-export { getPostByURL }
+const getPostList = (callback) => {
+    fetch(`${process.env.REACT_APP_X}` + '/blog')
+        .then((response) => response.json())
+        .then((x) => callback(x))
+}
+
+export { getPostByURL, getPostList }

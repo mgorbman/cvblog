@@ -6,7 +6,12 @@ import parse from 'html-react-parser'
 
 export default (props) => {
     const [state, setState] = useState(null)
+
+    // Takes the dynamic url from index.tsx
     const { title } = useParams()
+    // const x = useParams()
+    // const title = x.title
+
     //This conditional is a naive solution (assuming a single render)
     if (state == null) {
         getPostByURL(title, setState)
