@@ -1,5 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { getPostList } from '../Api'
+import PostListEntry from './PostListEntry'
 import { useState } from 'react'
 
 export default () => {
@@ -9,14 +10,12 @@ export default () => {
         getPostList(setState)
         return <div>Loading data</div>
     }
+    // console.log(state)
     return (
         <>
             <h2>Post List</h2>
-            {Object.values(state).map((post) => (
-                <div>
-                    {post.title}
-                    {post.date}
-                </div>
+            {state.map(({ title, url, date }) => (
+                <PostListEntry title={title} url={url} date={date} />
             ))}
         </>
     )
