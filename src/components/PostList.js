@@ -15,7 +15,7 @@ export default () => {
         <>
             <h2>Post List</h2>
             {state.map(({ title, url, date }) => (
-                <PostListEntry title={title} url={url} date={date} />
+                <PostListEntry key={url} title={title} url={url} date={date} />
             ))}
         </>
     )
