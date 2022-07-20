@@ -6,7 +6,7 @@ import parse from 'html-react-parser'
 
 export default (props) => {
     const [state, setState] = useState(null)
-    pushPost({ title: 'test', content: 'This is a test post' })
+    pushPost({ title: 'test', content: 'This is a test post' }, console.log)
     // Takes the dynamic url from index.tsx
     const { title } = useParams()
     // const x = useParams()
