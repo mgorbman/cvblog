@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { useParams } from 'react-router-dom'
-import { getPostByURL, pushPost } from '../Api'
+import { getPostByURL, pushPost } from '../../Api'
 import { useState } from 'react'
 import parse from 'html-react-parser'
 

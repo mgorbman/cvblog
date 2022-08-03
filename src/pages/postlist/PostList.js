@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { getPostList } from '../Api'
-import PostListEntry from './PostListEntry'
+import { getPostList } from '../../Api'
+import PostListEntry from '../../components/PostListEntry'
 import { useState } from 'react'
 
 export default () => {
