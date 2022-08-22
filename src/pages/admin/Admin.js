@@ -1,6 +1,7 @@
+/* eslint-disable import/no-anonymous-default-export */
+
 import Editor from '../../components/Editor'
-import PostListEntry from '../../components/PostListEntry'
-import { getPostByURL, pushPost } from '../../Api'
+import { pushPost } from '../../Api'
 import { useState } from 'react'
 
 export default () => {
