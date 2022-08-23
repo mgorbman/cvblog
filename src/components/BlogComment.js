@@ -1,6 +1,6 @@
 import CommentEditor from './CommentEditor'
 import { useState } from 'react'
-import { pushComment } from '../Api'
+
 export default function BlogComment({ comment, submit }) {
     const [inEdit, setEdit] = useState(false)
 

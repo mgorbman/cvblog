@@ -25,13 +25,6 @@ export default (props) => {
         updatePost(updatedPost, console.log)
     }
 
-    const submitFullCommentData = ({ content, name }) => {
-        pushComment(
-            { content, name, url: title, respondingTo: null },
-            console.log
-        )
-    }
-
     const replyToComment =
         (commentID) =>
         ({ content, name }) => {
@@ -56,7 +49,7 @@ export default (props) => {
             <h2>Blog</h2>
             {JSON.stringify(state)}
             <div>{parse(state.content)}</div>
-            <CommentEditor submit={submitFullCommentData} />
+            <CommentEditor submit={replyToComment(null)} />
 
             {state.comments &&
                 state.comments.map((comment) => (
