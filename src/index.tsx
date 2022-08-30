@@ -7,7 +7,8 @@ import Homepage from './pages/homepage/Homepage'
 import { Admin, CV } from './pages'
 import Blog from './pages/blog/Blog'
 import PostList from './pages/postlist/PostList'
-import { createMachine, interpret } from 'xstate'
+import { useQuery } from 'react-query'
+import { QueryClientProvider, QueryClient } from 'react-query'
 
 // import { useMachine } from '@xstate/react'
 // import { toggleMachine } from '../path/to/toggleMachine'
@@ -21,17 +22,20 @@ import { createMachine, interpret } from 'xstate'
 //         </button>
 //     )
 // }
+const queryClient = new QueryClient()
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
-    <BrowserRouter>
-        <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="cv" element={<CV />} />
-            <Route path="blog" element={<PostList />} />
-            <Route path="blog/:title" element={<Blog />} />
-            <Route path="admin" element={<Admin />} />
-        </Routes>
-        <App />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Homepage />} />
+                <Route path="cv" element={<CV />} />
+                <Route path="blog" element={<PostList />} />
+                <Route path="blog/:title" element={<Blog />} />
+                <Route path="admin" element={<Admin />} />
+            </Routes>
+            <App />
+        </BrowserRouter>
+    </QueryClientProvider>
 )
