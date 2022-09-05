@@ -1,4 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
+import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import {
     getPostByURL,
@@ -12,16 +13,39 @@ import CommentEditor from '../../components/CommentEditor'
 import parse from 'html-react-parser'
 import Editor from '../../components/Editor'
 import BlogComment from '../../components/BlogComment'
+import { useQuery } from 'react-query'
 
 export default (props) => {
-    const [state, setState] = useState(null)
     const [inEdit, setEdit] = useState(false)
+    const { posturl } = useParams()
 
-    // Takes the dynamic url from index.tsx
-    const { title } = useParams()
+    function getPost(queryString) {
+        return async () => {
+            const response = await fetch(
+                `${process.env.REACT_APP_BACKEND}/blogposts/${posturl}?${queryString}`
+            )
+            return response.json()
+        }
+    }
+
+    const { data: postData, status: postStatus } = useQuery(
+        ['getPostData', posturl],
+        getPost('ignoreComments=true'),
+        {
+            staleTime: 120000,
+        }
+    )
+
+    const { data: commentData, status: commentStatus } = useQuery(
+        ['getPostComments', posturl],
+        getPost('commentsOnly=true'),
+        {
+            staleTime: 120000,
+        }
+    )
 
     const editPost = () => {
-        const updatedPost = { id: state._id, content: state.content }
+        const updatedPost = { id: postData._id, content: postData.content }
         updatePost(updatedPost, console.log)
     }
 
@@ -29,30 +53,26 @@ export default (props) => {
         (commentID) =>
         ({ content, name }) => {
             pushComment(
-                { content, name, url: title, respondingTo: commentID },
+                { content, name, url: posturl, respondingTo: commentID },
                 console.log
             )
         }
 
-    //This conditional is a naive solution (assuming a single render)
-    if (state == null) {
-        getPostByURL(title, setState)
+    if (postStatus === 'loading') {
         return <div>Loading data</div>
     }
-    if (state != null && !('comments' in state)) {
-        getCommentsByPostURL(title, ({ comments }) =>
-            setState({ ...state, comments })
-        )
-    }
+
     return (
         <>
+            <Link to="/blog">Back to posts-list</Link>
+            <br />
             <h2>Blog</h2>
-            {JSON.stringify(state)}
-            <div>{parse(state.content)}</div>
+            {JSON.stringify(postData)}
+            <div>{parse(postData.content)}</div>
             <CommentEditor submit={replyToComment(null)} />
 
-            {state.comments &&
-                state.comments.map((comment) => (
+            {commentStatus !== 'loading' &&
+                commentData.comments.map((comment) => (
                     <BlogComment
                         key={comment._id}
                         comment={comment}
@@ -62,24 +82,14 @@ export default (props) => {
             {inEdit === true && (
                 <>
                     <Editor
-                        data={state.content}
+                        data={postData.content}
                         submit={(htmlString) => {
-                            setState({
-                                ...state,
-                                content: htmlString,
-                            })
+                            // setState({
+                            //     ...state,
+                            //     content: htmlString,
+                            // })
                             setEdit(false)
                         }}
-                    />
-                    <input
-                        type="text"
-                        value={state.title}
-                        onChange={(event) =>
-                            setState({
-                                ...state,
-                                title: event.target.value,
-                            })
-                        }
                     />
                 </>
             )}

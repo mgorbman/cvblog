@@ -7,7 +7,6 @@ import Homepage from './pages/homepage/Homepage'
 import { Admin, CV } from './pages'
 import Blog from './pages/blog/Blog'
 import PostList from './pages/postlist/PostList'
-import { useQuery } from 'react-query'
 import { QueryClientProvider, QueryClient } from 'react-query'
 
 // import { useMachine } from '@xstate/react'
@@ -32,7 +31,7 @@ root.render(
                 <Route path="/" element={<Homepage />} />
                 <Route path="cv" element={<CV />} />
                 <Route path="blog" element={<PostList />} />
-                <Route path="blog/:title" element={<Blog />} />
+                <Route path="blog/:posturl" element={<Blog />} />
                 <Route path="admin" element={<Admin />} />
             </Routes>
             <App />

@@ -3,6 +3,7 @@ import { getPostList } from '../../Api'
 import PostListEntry from '../../components/PostListEntry'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
+import { Link } from 'react-router-dom'
 
 export default () => {
     // const [state, setState] = useState(null)
@@ -17,7 +18,7 @@ export default () => {
         return response.json()
     }
 
-    const { data, status } = useQuery('keyTest', getAllPosts, {
+    const { data, status } = useQuery('getAllPosts', getAllPosts, {
         staleTime: 120000,
     })
 
@@ -26,6 +27,8 @@ export default () => {
     }
     return (
         <>
+            <Link to="/">Back to homepage</Link>
+            <br />
             <h2>Post List</h2>
             {data.map(({ title, url, date }) => (
                 <PostListEntry key={url} title={title} url={url} date={date} />
