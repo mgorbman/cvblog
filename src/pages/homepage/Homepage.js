@@ -10,6 +10,8 @@ export default () => {
             <Link to="/blog">Blog</Link>
             <br />
             <Link to="/cv">CV</Link>
+            <br />
+            <Link to="/admin">Admin</Link>
         </>
     )
 }
