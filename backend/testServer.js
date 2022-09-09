@@ -33,6 +33,7 @@ const blogPost_POST = (response, body, requestURL) => {
                 .collection('entries')
                 .insertOne(parsedBody)
             response.write(JSON.stringify(parsedBody))
+            response.end()
         }
         if (queryStr.isPost === 'false') {
             // if (false) {

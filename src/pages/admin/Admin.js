@@ -2,13 +2,16 @@
 
 import Editor from '../../components/Editor'
 import { getPostData, pushPost } from '../../Api'
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from 'react-query'
+import PostEditor from '../../components/PostEditor'
 
 export default () => {
-    const [state, setState] = useState('')
-    const [title, setTitle] = useState('')
+    const [postState, setPostState] = useState({
+        title: '',
+        content: '',
+    })
 
     const queryClient = useQueryClient()
 
@@ -22,38 +25,32 @@ export default () => {
                 body: JSON.stringify(data),
             }),
         {
-            onSuccess: async (data, variables) => {
-                const { title, date, url } = await data.json()
-                console.log('query debug')
-                queryClient.setQueryData('getAllPosts', (postList) => [
-                    ...postList,
-                    {
-                        title,
-                        date,
-                        url,
-                    },
-                ])
+            onSuccess: async (data, { title }) => {
+                const { date, url } = await data.json()
+                if (queryClient.getQueryData('getAllPosts'))
+                    queryClient.setQueryData('getAllPosts', (postList) => [
+                        ...postList,
+                        { title, date, url },
+                    ])
             },
         }
     )
 
-    const submitPost = () => {
-        const post = { title: title, content: state }
-        mutation.mutate(post)
+    const submitPost = (postData) => {
+        setPostState({ title: '', content: '' })
+        mutation.mutate(postData)
     }
 
     return (
         <div>
             <Link to="/">Back to Homepage</Link>
             <h2>Admin Page</h2>
-            <Editor data={null} submit={setState} />
-            <button onClick={submitPost}>Submit Post</button>
-            <input
-                type="text"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
+            <PostEditor
+                key={new Date().toISOString()}
+                title={postState.title}
+                content={postState.content}
+                submit={submitPost}
             />
-            {JSON.stringify(title)}
         </div>
     )
 }

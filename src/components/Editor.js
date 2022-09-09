@@ -5,7 +5,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
 // data - post body
 // submit - function
-export default function Editor({ data, submit }) {
+export default function Editor({ data, submit, submitText }) {
     const [body, setBody] = useState(typeof data === 'string' ? data : '')
     return (
         <div className="App">
@@ -19,7 +19,9 @@ export default function Editor({ data, submit }) {
                         setBody(data)
                     }}
                 />
-                <button onClick={() => submit(body)}>Submit</button>
+                <button onClick={() => submit(body)}>
+                    {typeof submitText === 'string' ? submitText : 'Submit'}
+                </button>
             </div>
         </div>
     )
