@@ -2,7 +2,7 @@
 
 import Editor from '../../components/Editor'
 import { getPostData, pushPost } from '../../Api'
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from 'react-query'
 import PostEditor from '../../components/PostEditor'
@@ -26,6 +26,7 @@ export default () => {
             }),
         {
             onSuccess: async (data, { title }) => {
+                setPostState({ title: '', content: '' })
                 const { date, url } = await data.json()
                 if (queryClient.getQueryData('getAllPosts'))
                     queryClient.setQueryData('getAllPosts', (postList) => [
@@ -37,7 +38,7 @@ export default () => {
     )
 
     const submitPost = (postData) => {
-        setPostState({ title: '', content: '' })
+        setPostState(postData)
         mutation.mutate(postData)
     }
 
@@ -46,7 +47,6 @@ export default () => {
             <Link to="/">Back to Homepage</Link>
             <h2>Admin Page</h2>
             <PostEditor
-                key={new Date().toISOString()}
                 title={postState.title}
                 content={postState.content}
                 submit={submitPost}

@@ -14,9 +14,11 @@ import parse from 'html-react-parser'
 import Editor from '../../components/Editor'
 import BlogComment from '../../components/BlogComment'
 import { useQuery } from 'react-query'
+import PostEditor from '../../components/PostEditor'
 
 export default (props) => {
     const [inEdit, setEdit] = useState(false)
+    const [wasEdited, setWasEdited] = useState(false)
     const { posturl } = useParams()
 
     function getPost(queryString) {
@@ -44,10 +46,25 @@ export default (props) => {
         }
     )
 
-    const editPost = () => {
-        const updatedPost = { id: postData._id, content: postData.content }
-        updatePost(updatedPost, console.log)
+    const { data, status } = useQuery('updateData', updateData, {
+        staleTime: 120000,
+    })
+
+    async function updateData(data) {
+        const response = await fetch(`${process.env.REACT_APP_X}/blogposts`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        return response.json()
     }
+
+    // const editPost = () => {
+    //     const updatedPost = { id: postData._id, content: postData.content }
+    //     updatePost(updatedPost, console.log)
+    // }
 
     const replyToComment =
         (commentID) =>
@@ -81,22 +98,23 @@ export default (props) => {
                 ))}
             {inEdit === true && (
                 <>
-                    <Editor
-                        data={postData.content}
-                        submit={(htmlString) => {
-                            // setState({
-                            //     ...state,
-                            //     content: htmlString,
-                            // })
-                            setEdit(false)
-                        }}
+                    <PostEditor
+                        title={postData.title}
+                        content={postData.content}
+                        submit={(htmlString) => {}}
                     />
                 </>
             )}
             {inEdit === false && isAdmin === true && (
                 <>
                     <button onClick={() => setEdit(true)}>Edit Post</button>
-                    <button onClick={editPost}>Submit Edit</button>
+                    <button
+                        onClick={() => {
+                            setWasEdited(false)
+                        }}
+                    >
+                        Submit Edit
+                    </button>
                 </>
             )}
         </>

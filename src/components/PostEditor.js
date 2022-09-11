@@ -1,6 +1,6 @@
 import Editor from './Editor.js'
 import parse from 'html-react-parser'
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 
 const pageLayout = {
     width: '80%',
@@ -11,8 +11,7 @@ const titleStyling = {
 }
 const flagFlipper = (flag) => !flag
 const stateReducer = (state, data) => {
-    if ('title' in data) return { content: state.content, title: data.title }
-    else return { title: state.title, content: data.content }
+    return { ...state, ...data }
 }
 
 export default function PostEditor({ content, title, submit }) {
@@ -21,6 +20,9 @@ export default function PostEditor({ content, title, submit }) {
         title: title === undefined ? '' : title,
         content: content === undefined ? '' : content,
     })
+    useEffect(() => {
+        setState({ content, title })
+    }, [content, title])
     return (
         <div style={pageLayout}>
             {!inPreview && (
@@ -37,6 +39,7 @@ export default function PostEditor({ content, title, submit }) {
                     </div>
                     <div>
                         <Editor
+                            key={new Date().toISOString()}
                             data={state.content}
                             submit={(contentString) => {
                                 setState({ content: contentString })
@@ -52,7 +55,14 @@ export default function PostEditor({ content, title, submit }) {
                     <h1>{state.title}</h1>
                     {parse(state.content)}
                     <button onClick={flipInPreview}>Resume Editing</button>
-                    <button onClick={() => submit(state)}>Submit Post</button>
+                    <button
+                        onClick={() => {
+                            submit(state)
+                            flipInPreview()
+                        }}
+                    >
+                        Submit Post
+                    </button>
                 </div>
             )}
         </div>
