@@ -14,7 +14,7 @@ const stateReducer = (state, data) => {
     return { ...state, ...data }
 }
 
-export default function PostEditor({ content, title, submit }) {
+export default function PostEditor({ content, title, submit, editable }) {
     const [inPreview, flipInPreview] = useReducer(flagFlipper, false)
     const [state, setState] = useReducer(stateReducer, {
         title: title === undefined ? '' : title,
@@ -23,6 +23,7 @@ export default function PostEditor({ content, title, submit }) {
     useEffect(() => {
         setState({ content, title })
     }, [content, title])
+
     return (
         <div style={pageLayout}>
             {!inPreview && (
@@ -30,6 +31,7 @@ export default function PostEditor({ content, title, submit }) {
                     <div>
                         <span style={titleStyling}>Post Title: </span>
                         <input
+                            readOnly={!editable.title}
                             type="text"
                             value={state.title}
                             onChange={(event) =>

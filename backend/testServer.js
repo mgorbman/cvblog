@@ -12,7 +12,7 @@ function createDate() {
 }
 
 const blogPost_POST = (response, body, requestURL) => {
-    console.log(requestURL)
+    // console.log(requestURL)
     const queryStr = urlModule.parse(requestURL, true).query
 
     return async () => {
@@ -37,29 +37,26 @@ const blogPost_POST = (response, body, requestURL) => {
         }
         if (queryStr.isPost === 'false') {
             // if (false) {
-            try {
-                await mongoClient
-                    .db('posts')
-                    .collection('entries')
-                    .updateOne(
-                        {
-                            url: urlModule
-                                .parse(requestURL, true)
-                                .pathname.split('/blogposts/')[1],
-                        },
-                        {
-                            $push: {
-                                comments: {
-                                    ...parsedBody,
-                                    date: new Date().toISOString(),
-                                    _id: new ObjectId(),
-                                },
+
+            await mongoClient
+                .db('posts')
+                .collection('entries')
+                .updateOne(
+                    {
+                        url: urlModule
+                            .parse(requestURL, true)
+                            .pathname.split('/blogposts/')[1],
+                    },
+                    {
+                        $push: {
+                            comments: {
+                                ...parsedBody,
+                                date: new Date().toISOString(),
+                                _id: new ObjectId(),
                             },
-                        }
-                    )
-            } catch (e) {
-                console.log(e)
-            }
+                        },
+                    }
+                )
         }
     }
 }

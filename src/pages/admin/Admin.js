@@ -50,6 +50,7 @@ export default () => {
                 title={postState.title}
                 content={postState.content}
                 submit={submitPost}
+                editable={{ title: true, content: true }}
             />
         </div>
     )
