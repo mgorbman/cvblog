@@ -47,26 +47,6 @@ export default (props) => {
         }
     )
 
-    // const { data, status } = useQuery('updateData', updateData, {
-    //     staleTime: 120000,
-    // })
-
-    async function updateData(data) {
-        const response = await fetch(`${process.env.REACT_APP_X}/blogposts`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        return response.json()
-    }
-
-    // const editPost = () => {
-    //     const updatedPost = { id: postData._id, content: postData.content }
-    //     updatePost(updatedPost, console.log)
-    // }
-
     const queryClient = useQueryClient()
 
     const mutation = useMutation(
@@ -79,20 +59,12 @@ export default (props) => {
                 body: JSON.stringify(data),
             }),
         {
-            onSuccess: async (data, { title }) => {
-                // setPostState({ title: '', content: '' })
-                const { content } = await data.json()
-
-                // if (queryClient.getQueryData('getPostData')) {
-                //     console.log('test')
-                queryClient.setQueryData('getPostData', (post) => {
-                    console.log(queryClient.getQueriesData('getPostData'))
-                    post[0][1].content = content
-                    return post
-                })
-            },
+            onSuccess: (_, { content: newContent }) =>
+                queryClient.setQueryData(
+                    ['getPostData', posturl],
+                    (oldPost) => ({ ...oldPost, content: newContent })
+                ),
         }
-        // }
     )
 
     const replyToComment =
