@@ -1,6 +1,7 @@
 import Editor from './Editor.js'
 import parse from 'html-react-parser'
 import { useEffect, useReducer } from 'react'
+import { State } from 'xstate'
 
 const pageLayout = {
     width: '80%',
@@ -14,7 +15,7 @@ const stateReducer = (state, data) => {
     return { ...state, ...data }
 }
 
-export default function PostEditor({ content, title, submit, editable }) {
+export default function PostEditor({ content, title, submit, disableEditing }) {
     const [inPreview, flipInPreview] = useReducer(flagFlipper, false)
     const [state, setState] = useReducer(stateReducer, {
         title: title === undefined ? '' : title,
@@ -30,14 +31,22 @@ export default function PostEditor({ content, title, submit, editable }) {
                 <>
                     <div>
                         <span style={titleStyling}>Post Title: </span>
-                        <input
-                            readOnly={!editable.title}
-                            type="text"
-                            value={state.title}
-                            onChange={(event) =>
-                                setState({ title: event.target.value })
-                            }
-                        />
+                        {!(
+                            Array.isArray(disableEditing) &&
+                            disableEditing.includes('title')
+                        ) && (
+                            <input
+                                type="text"
+                                value={state.title}
+                                onChange={(event) =>
+                                    setState({ title: event.target.value })
+                                }
+                            />
+                        )}
+                        {Array.isArray(disableEditing) &&
+                            disableEditing.includes('title') && (
+                                <span>{state.title}</span>
+                            )}
                     </div>
                     <div>
                         <Editor

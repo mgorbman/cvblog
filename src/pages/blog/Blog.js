@@ -67,13 +67,39 @@ export default (props) => {
         }
     )
 
-    const replyToComment =
+    const commentMutation = useMutation(
+        ({ name, content, respondingTo, posturl }) =>
+            fetch(
+                `${process.env.REACT_APP_BACKEND}/blogposts/${posturl}?isPost=false`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, content, respondingTo }),
+                }
+            ),
+        {
+            // onSuccess: async (data) => {
+            //     const { date, poster, content } = await data.json()
+            //     if (queryClient.getQueryData('getPostComments'))
+            //         queryClient.setQueryData(
+            //             ['getPostComments', posturl],
+            //             (comments) => [...comments, { poster, content, date }]
+            //         )
+            // },
+        }
+    )
+
+    const createComment =
         (commentID) =>
         ({ content, name }) => {
-            pushComment(
-                { content, name, url: posturl, respondingTo: commentID },
-                console.log
-            )
+            commentMutation.mutate({
+                name,
+                content,
+                respondingTo: commentID,
+                posturl,
+            })
         }
 
     if (postStatus === 'loading') {
@@ -86,14 +112,14 @@ export default (props) => {
             <h2>Blog</h2>
             {JSON.stringify(postData)}
             <div>{parse(postData.content)}</div>
-            <CommentEditor submit={replyToComment(null)} />
+            <CommentEditor submit={createComment(null)} />
 
             {commentStatus !== 'loading' &&
                 commentData.comments.map((comment) => (
                     <BlogComment
                         key={comment._id}
                         comment={comment}
-                        submit={replyToComment(comment._id)}
+                        submit={createComment(comment._id)}
                     />
                 ))}
             {inEdit === true && (
@@ -108,7 +134,7 @@ export default (props) => {
                                 content: htmlString.content,
                             })
                         }}
-                        editable={{ title: false, content: true }}
+                        disableEditing={['title']}
                     />
                 </>
             )}
