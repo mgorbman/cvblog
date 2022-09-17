@@ -1,7 +1,6 @@
 import Editor from './Editor.js'
 import parse from 'html-react-parser'
 import { useEffect, useReducer } from 'react'
-import { State } from 'xstate'
 
 const pageLayout = {
     width: '80%',

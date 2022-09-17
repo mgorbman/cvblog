@@ -17,11 +17,9 @@ const blogPost_POST = (response, body, requestURL) => {
 
     return async () => {
         const parsedBody = JSON.parse(body)
+        parsedBody.date = createDate()
 
         if (queryStr.isPost === 'true') {
-            // if (true) {
-            parsedBody.date = createDate()
-
             let postURL = parsedBody.title.toLowerCase()
             postURL = postURL.replaceAll(' ', '_')
             postURL = `${postURL}-${parsedBody.date}`
@@ -36,8 +34,8 @@ const blogPost_POST = (response, body, requestURL) => {
             response.end()
         }
         if (queryStr.isPost === 'false') {
-            // if (false) {
-
+            console.log(parsedBody)
+            const x = new ObjectId()
             await mongoClient
                 .db('posts')
                 .collection('entries')
@@ -51,12 +49,13 @@ const blogPost_POST = (response, body, requestURL) => {
                         $push: {
                             comments: {
                                 ...parsedBody,
-                                date: new Date().toISOString(),
-                                _id: new ObjectId(),
+                                _id: x,
                             },
                         },
                     }
                 )
+            response.write(JSON.stringify({ date: parsedBody.date, _id: x }))
+            response.end()
         }
     }
 }

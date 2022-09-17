@@ -67,8 +67,8 @@ export default (props) => {
         }
     )
 
-    const commentMutation = useMutation(
-        ({ name, content, respondingTo, posturl }) =>
+    const { mutate: publishComment } = useMutation(
+        ({ posturl, ...rest }) =>
             fetch(
                 `${process.env.REACT_APP_BACKEND}/blogposts/${posturl}?isPost=false`,
                 {
@@ -76,28 +76,40 @@ export default (props) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name, content, respondingTo }),
+                    body: JSON.stringify(rest),
                 }
             ),
         {
-            // onSuccess: async (data) => {
-            //     const { date, poster, content } = await data.json()
-            //     if (queryClient.getQueryData('getPostComments'))
-            //         queryClient.setQueryData(
-            //             ['getPostComments', posturl],
-            //             (comments) => [...comments, { poster, content, date }]
-            //         )
-            // },
+            onSuccess: async (data, variables) => {
+                const { date, _id } = await data.json()
+                queryClient.setQueryData(
+                    ['getPostComments', posturl],
+                    ({ comments }) => {
+                        return {
+                            comments: [
+                                ...comments,
+                                {
+                                    ...variables,
+                                    _id,
+                                    date,
+                                },
+                            ],
+                        }
+                    }
+                )
+            },
         }
     )
 
     const createComment =
-        (commentID) =>
+        (respondingTo) =>
         ({ content, name }) => {
-            commentMutation.mutate({
+            console.log(respondingTo)
+            debugger
+            publishComment({
                 name,
                 content,
-                respondingTo: commentID,
+                respondingTo,
                 posturl,
             })
         }
@@ -109,6 +121,9 @@ export default (props) => {
         <>
             <Link to="/blog">Back to posts-list</Link>
             <br />
+            {JSON.stringify(
+                queryClient.getQueryData(['getPostComments', posturl])
+            )}
             <h2>Blog</h2>
             {JSON.stringify(postData)}
             <div>{parse(postData.content)}</div>
