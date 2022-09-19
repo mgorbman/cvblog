@@ -1,18 +1,10 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
-import {
-    getPostByURL,
-    updatePost,
-    getCommentsByPostURL,
-    pushComment,
-    getPostData,
-} from '../../Api'
 import { useState } from 'react'
 import { isAdmin } from '../../globalStates'
 import CommentEditor from '../../components/CommentEditor'
 import parse from 'html-react-parser'
-import Editor from '../../components/Editor'
 import BlogComment from '../../components/BlogComment'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 import PostEditor from '../../components/PostEditor'
@@ -49,7 +41,7 @@ export default (props) => {
 
     const queryClient = useQueryClient()
 
-    const mutation = useMutation(
+    const { mutate: updatePost } = useMutation(
         (data) =>
             fetch(`${process.env.REACT_APP_BACKEND}/blogposts?isPost=true`, {
                 method: 'PUT',
@@ -68,7 +60,7 @@ export default (props) => {
     )
 
     const { mutate: publishComment } = useMutation(
-        ({ posturl, ...rest }) =>
+        (data) =>
             fetch(
                 `${process.env.REACT_APP_BACKEND}/blogposts/${posturl}?isPost=false`,
                 {
@@ -76,12 +68,12 @@ export default (props) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(rest),
+                    body: JSON.stringify(data),
                 }
             ),
         {
             onSuccess: async (data, variables) => {
-                const { date, _id } = await data.json()
+                const response = await data.json()
                 queryClient.setQueryData(
                     ['getPostComments', posturl],
                     ({ comments }) => {
@@ -90,8 +82,7 @@ export default (props) => {
                                 ...comments,
                                 {
                                     ...variables,
-                                    _id,
-                                    date,
+                                    ...response,
                                 },
                             ],
                         }
@@ -104,67 +95,71 @@ export default (props) => {
     const createComment =
         (respondingTo) =>
         ({ content, name }) => {
-            console.log(respondingTo)
-            debugger
             publishComment({
                 name,
                 content,
                 respondingTo,
-                posturl,
             })
         }
+
+    const newCommentsObj = {}
 
     if (postStatus === 'loading') {
         return <div>Loading data</div>
     }
+
     return (
         <>
             <Link to="/blog">Back to posts-list</Link>
             <br />
-            {JSON.stringify(
-                queryClient.getQueryData(['getPostComments', posturl])
-            )}
             <h2>Blog</h2>
-            {JSON.stringify(postData)}
-            <div>{parse(postData.content)}</div>
-            <CommentEditor submit={createComment(null)} />
-
-            {commentStatus !== 'loading' &&
-                commentData.comments.map((comment) => (
-                    <BlogComment
-                        key={comment._id}
-                        comment={comment}
-                        submit={createComment(comment._id)}
-                    />
-                ))}
-            {inEdit === true && (
+            {inEdit && (
                 <>
                     <PostEditor
                         title={postData.title}
                         content={postData.content}
-                        submit={(htmlString) => {
-                            // console.log(htmlString)
-                            mutation.mutate({
-                                id: postData._id,
-                                content: htmlString.content,
-                            })
+                        submit={({ content }) => {
+                            if (content !== postData.content) {
+                                updatePost({
+                                    id: postData._id,
+                                    content,
+                                })
+                            }
+                            setEdit(false)
                         }}
                         disableEditing={['title']}
                     />
                 </>
             )}
-            {inEdit === false && isAdmin === true && (
+            {!inEdit && (
                 <>
+                    <h3>{postData.title}</h3>
+                    <div>{parse(postData.content)}</div>
                     <button onClick={() => setEdit(true)}>Edit Post</button>
-                    <button
-                        onClick={() => {
-                            setWasEdited(false)
-                        }}
-                    >
-                        Submit Edit
-                    </button>
                 </>
             )}
+            <CommentEditor submit={createComment(null)} />
+
+            {commentStatus !== 'loading' &&
+                (() => {
+                    Object.values(commentData.comments).forEach((c) => {
+                        if (c.respondingTo) {
+                            if (!newCommentsObj[c.respondingTo]) {
+                                newCommentsObj[c.respondingTo] = []
+                            }
+                            newCommentsObj[c.respondingTo].push(c)
+                        }
+                        // console.log(c.respondingTo)
+                    })
+                    console.log(newCommentsObj)
+                    return commentData.comments.map((comment) => (
+                        <BlogComment
+                            key={comment._id}
+                            comment={comment}
+                            submit={createComment(comment._id)}
+                        />
+                    ))
+                })()}
         </>
     )
 }

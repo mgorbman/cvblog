@@ -6,18 +6,15 @@ export default function BlogComment({ comment, submit }) {
 
     return (
         <div>
-            <label>Poster</label>
+            <span>Poster: </span>
+            <span>{comment.name}</span>
             <br />
-            <input value={comment.name} onChange={() => {}} />
+            <span>Date: </span>
+            <span> {comment.date} </span>
             <br />
-            <label>Date</label>
+            <span>Content: </span>
             <br />
-            <input value={comment.date} onChange={() => {}} />
-            <br />
-            <label>Content</label>
-            <br />
-            <textarea value={comment.content} onChange={() => {}}></textarea>
-            <br />
+            <div> {comment.content} </div>
             <button
                 onClick={() => {
                     setEdit(!inEdit)
@@ -26,6 +23,7 @@ export default function BlogComment({ comment, submit }) {
                 {inEdit ? 'Close' : 'Reply'}
             </button>
             {inEdit === true && <CommentEditor submit={submit} />}
+            <hr />
         </div>
     )
 }

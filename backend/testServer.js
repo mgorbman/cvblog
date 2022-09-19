@@ -12,7 +12,6 @@ function createDate() {
 }
 
 const blogPost_POST = (response, body, requestURL) => {
-    // console.log(requestURL)
     const queryStr = urlModule.parse(requestURL, true).query
 
     return async () => {
@@ -34,7 +33,6 @@ const blogPost_POST = (response, body, requestURL) => {
             response.end()
         }
         if (queryStr.isPost === 'false') {
-            console.log(parsedBody)
             const x = new ObjectId()
             await mongoClient
                 .db('posts')
@@ -138,9 +136,6 @@ http.createServer((request, response) => {
             response.statusCode = 200
             response.setHeader('Content-Type', 'application/json')
 
-            // console.log("body:" + body);
-            // console.log(urlModule.parse(request.url, true).pathname);
-            // console.log(urlModule.parse(request.url, true).pathname.split("/")[2])
             const resolver = {
                 blogposts: {
                     POST: blogPost_POST(response, body, request.url),
@@ -150,7 +145,6 @@ http.createServer((request, response) => {
                 },
             }
 
-            // console.log("request url:" + request.url);
             await resolver[
                 urlModule.parse(request.url, true).pathname.split('/')[1]
             ][request.method]()
