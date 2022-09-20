@@ -9,6 +9,8 @@ export default function BlogComment({ comment, submit }) {
             <span>Poster: </span>
             <span>{comment.name}</span>
             <br />
+            <div> {comment._id} </div>
+            <br />
             <span>Date: </span>
             <span> {comment.date} </span>
             <br />

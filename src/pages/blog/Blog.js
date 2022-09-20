@@ -8,6 +8,7 @@ import parse from 'html-react-parser'
 import BlogComment from '../../components/BlogComment'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 import PostEditor from '../../components/PostEditor'
+import CommentTreeView from '../../components/CommentTreeView'
 
 export default (props) => {
     const [inEdit, setEdit] = useState(false)
@@ -102,7 +103,7 @@ export default (props) => {
             })
         }
 
-    const newCommentsObj = {}
+    // const newCommentsObj = {}
 
     if (postStatus === 'loading') {
         return <div>Loading data</div>
@@ -140,26 +141,31 @@ export default (props) => {
             )}
             <CommentEditor submit={createComment(null)} />
 
-            {commentStatus !== 'loading' &&
-                (() => {
-                    Object.values(commentData.comments).forEach((c) => {
-                        if (c.respondingTo) {
-                            if (!newCommentsObj[c.respondingTo]) {
-                                newCommentsObj[c.respondingTo] = []
-                            }
-                            newCommentsObj[c.respondingTo].push(c)
-                        }
-                        // console.log(c.respondingTo)
-                    })
-                    console.log(newCommentsObj)
-                    return commentData.comments.map((comment) => (
-                        <BlogComment
-                            key={comment._id}
-                            comment={comment}
-                            submit={createComment(comment._id)}
-                        />
-                    ))
-                })()}
+            {
+                commentStatus !== 'loading' && (
+                    <CommentTreeView comments={commentData.comments} />
+                )
+                // (() => {
+                //     Object.values(commentData.comments).forEach((c) => {
+                //         if (c.respondingTo) {
+                //             if (!newCommentsObj[c.respondingTo]) {
+                //                 newCommentsObj[c.respondingTo] = []
+                //             }
+                //             newCommentsObj[c.respondingTo].push(c)
+                //         }
+                //         // console.log(c.respondingTo)
+                //     })
+                //     console.log(newCommentsObj)
+                //     return commentData.comments.map((comment) => (
+                //         <BlogComment
+                //             key={comment._id}
+                //             comment={comment}
+                //             submit={createComment(comment._id)}
+                //             id={comment._id}
+                //         />
+                //     ))
+                // })()}
+            }
         </>
     )
 }
