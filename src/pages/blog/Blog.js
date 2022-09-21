@@ -96,6 +96,7 @@ export default (props) => {
     const createComment =
         (respondingTo) =>
         ({ content, name }) => {
+            debugger
             publishComment({
                 name,
                 content,
@@ -143,7 +144,10 @@ export default (props) => {
 
             {
                 commentStatus !== 'loading' && (
-                    <CommentTreeView comments={commentData.comments} />
+                    <CommentTreeView
+                        comments={commentData.comments}
+                        submit={createComment}
+                    />
                 )
                 // (() => {
                 //     Object.values(commentData.comments).forEach((c) => {

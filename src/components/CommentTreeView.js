@@ -1,9 +1,9 @@
 import MagicalComment from './MagicalComment'
 
-export default function CommentTreeView({ comments }) {
+export default function CommentTreeView({ comments, submit }) {
     const magicalComments = {}
 
-    Object.values(comments).forEach((c) => {
+    comments.forEach((c) => {
         if (c.respondingTo) {
             if (!magicalComments[c.respondingTo]) {
                 magicalComments[c.respondingTo] = []
@@ -24,6 +24,7 @@ export default function CommentTreeView({ comments }) {
                         comment={c}
                         key={c._id}
                         data={magicalComments}
+                        submit={submit}
                     />
                 ))}
         </div>

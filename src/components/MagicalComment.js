@@ -1,11 +1,23 @@
-export default function MagicalComment({ comment, data, parent }) {
-    const margin = parent ? 0 : 25
+import { useState } from 'react'
+import CommentEditor from './CommentEditor'
+
+export default function MagicalComment({ comment, data, parent, submit }) {
+    const [inEdit, setEdit] = useState(false)
+
     return (
-        <div style={{ marginLeft: margin }}>
+        <div style={{ marginLeft: parent ? '0px' : '25px' }}>
             <span>{comment.name}</span>
             <br />
             <div> {comment._id} </div>
             <br />
+            <button
+                onClick={() => {
+                    setEdit(!inEdit)
+                }}
+            >
+                {inEdit ? 'Close' : 'Reply'}
+            </button>
+            {inEdit === true && <CommentEditor submit={submit(comment._id)} />}
             <div>
                 {data[comment._id] &&
                     data[comment._id].map((c) => {
@@ -15,6 +27,7 @@ export default function MagicalComment({ comment, data, parent }) {
                                 comment={c}
                                 key={c._id}
                                 data={data}
+                                submit={submit}
                             />
                         )
                     })}
