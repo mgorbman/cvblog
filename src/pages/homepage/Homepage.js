@@ -12,6 +12,9 @@ export default () => {
             <Link to="/cv">CV</Link>
             <br />
             <Link to="/admin">Admin</Link>
+            <br />
+            <br />
+            <Link to="/login">Login</Link>
         </>
     )
 }

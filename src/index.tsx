@@ -8,6 +8,7 @@ import { Admin, CV } from './pages'
 import Blog from './pages/blog/Blog'
 import PostList from './pages/postlist/PostList'
 import { QueryClientProvider, QueryClient } from 'react-query'
+import { Login } from './pages/login'
 
 // import { useMachine } from '@xstate/react'
 // import { toggleMachine } from '../path/to/toggleMachine'
@@ -33,6 +34,7 @@ root.render(
                 <Route path="blog" element={<PostList />} />
                 <Route path="blog/:posturl" element={<Blog />} />
                 <Route path="admin" element={<Admin />} />
+                <Route path="login" element={<Login />} />
             </Routes>
             <App />
         </BrowserRouter>

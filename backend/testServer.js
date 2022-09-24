@@ -2,16 +2,38 @@ const http = require('http')
 const urlModule = require('url')
 
 const { MongoClient, ObjectId } = require('mongodb')
+const jwt = require('jsonwebtoken')
+const { on } = require('events')
 
 const mongoURL = 'mongodb://127.0.0.1:27017'
 const mongoClient = new MongoClient(mongoURL)
+const secretString =
+    'fbcfba53b4854526d105282a36d34ed919fcc34c86b3ca020411898b3e38cefcb2f7a3434af50ad0102320251d32506ed4d87855c0659f9f7de31055dd9e2709'
+
+const token_POST = (response, { user, password }) => {
+    return async () => {
+        const accessToken = jwt.sign({ user, password }, secretString, {
+            expiresIn: '3600',
+        })
+        response.setHeader('Access-Control-Allow-Credentials', true)
+        response.setHeader(
+            'Access-Control-Allow-Origin',
+            'http://localhost:3000'
+        )
+        response.setHeader(
+            'Set-Cookie',
+            `Auth=${accessToken}; Path=/, SameSite=None`
+        )
+        response.end()
+    }
+}
 
 function createDate() {
     let date = new Date()
     return `${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}`
 }
 
-const blogPost_POST = (response, body, requestURL) => {
+const blogPost_POST = (response, body, requestURL, request) => {
     const queryStr = urlModule.parse(requestURL, true).query
 
     return async () => {
@@ -105,6 +127,7 @@ const blogPost_DELETE = async () => () => null
 
 http.createServer((request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*')
+    response.setHeader('Access-Control-Expose-Headers', '*')
     response.setHeader(
         'Access-Control-Allow-Methods',
         'OPTIONS, POST, GET, PUT, DELETE'
@@ -138,10 +161,13 @@ http.createServer((request, response) => {
 
             const resolver = {
                 blogposts: {
-                    POST: blogPost_POST(response, body, request.url),
+                    POST: blogPost_POST(response, body, request.url, request),
                     PUT: blogPost_PUT(response, body),
                     GET: blogPost_GET(response, request),
                     DELETE: blogPost_DELETE(response),
+                },
+                login: {
+                    POST: token_POST(response, body),
                 },
             }
 
