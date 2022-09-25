@@ -15,15 +15,12 @@ const token_POST = (response, { user, password }) => {
         const accessToken = jwt.sign({ user, password }, secretString, {
             expiresIn: '3600',
         })
-        response.setHeader('Access-Control-Allow-Credentials', true)
-        response.setHeader(
-            'Access-Control-Allow-Origin',
-            'http://localhost:3000'
-        )
-        response.setHeader(
-            'Set-Cookie',
-            `Auth=${accessToken}; Path=/, SameSite=None`
-        )
+        // response.setHeader('Access-Control-Allow-Credentials', true)
+        // response.setHeader(
+        //     'Access-Control-Allow-Origin',
+        //     'http://localhost:3000'
+        // )
+        response.setHeader('Set-Cookie', `Auth=${accessToken}`)
         response.end()
     }
 }
@@ -126,13 +123,13 @@ const blogPost_GET = (response, request) => {
 const blogPost_DELETE = async () => () => null
 
 http.createServer((request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*')
-    response.setHeader('Access-Control-Expose-Headers', '*')
+    response.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
     response.setHeader(
         'Access-Control-Allow-Methods',
         'OPTIONS, POST, GET, PUT, DELETE'
     )
     response.setHeader('Access-Control-Allow-Headers', '*')
+    response.setHeader('Access-Control-Allow-Credentials', true)
     response.setHeader('Access-Control-Max-Age', 2592000)
     if (request.method === 'OPTIONS') {
         response.end()

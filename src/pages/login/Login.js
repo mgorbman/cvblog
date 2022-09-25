@@ -5,9 +5,10 @@ import { useQuery } from 'react-query'
 async function login(credentials) {
     const response = await fetch(`${process.env.REACT_APP_X}/login`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
+        credentials: 'include',
         body: JSON.stringify(credentials),
     })
     console.log(response)
