@@ -46,10 +46,8 @@ export default (props) => {
         (data) =>
             fetch(`${process.env.REACT_APP_BACKEND}/blogposts?isPost=true`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(data),
+                credentials: 'include',
             }),
         {
             onSuccess: (_, { content: newContent }) =>
@@ -66,10 +64,8 @@ export default (props) => {
                 `${process.env.REACT_APP_BACKEND}/blogposts/${posturl}?isPost=false`,
                 {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify(data),
+                    credentials: 'include',
                 }
             ),
         {
@@ -96,7 +92,6 @@ export default (props) => {
     const createComment =
         (respondingTo) =>
         ({ content, name }) => {
-            debugger
             publishComment({
                 name,
                 content,

@@ -1,13 +1,11 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { Link } from 'react-router-dom'
 import { useQuery } from 'react-query'
+import { getAuthorization } from '../../Api'
 
 async function login(credentials) {
     const response = await fetch(`${process.env.REACT_APP_X}/login`, {
         method: 'POST',
-        // headers: {
-        //     'Content-Type': 'application/json',
-        // },
         credentials: 'include',
         body: JSON.stringify(credentials),
     })
@@ -40,7 +38,7 @@ export default () => {
                 Submit
             </button>
             <br />
-            <a href="/">Homepage</a>
+            <Link to="/">Homepage</Link>
         </>
     )
 }

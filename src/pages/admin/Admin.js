@@ -19,10 +19,8 @@ export default () => {
         (data) =>
             fetch(`${process.env.REACT_APP_BACKEND}/blogposts?isPost=true`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(data),
+                credentials: 'include',
             }),
         {
             onSuccess: async (data, { title }) => {

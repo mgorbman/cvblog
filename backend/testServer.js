@@ -13,31 +13,63 @@ const secretString =
 const token_POST = (response, { user, password }) => {
     return async () => {
         const accessToken = jwt.sign({ user, password }, secretString, {
-            expiresIn: '3600',
+            expiresIn: '3600000',
         })
-        // response.setHeader('Access-Control-Allow-Credentials', true)
-        // response.setHeader(
-        //     'Access-Control-Allow-Origin',
-        //     'http://localhost:3000'
-        // )
         response.setHeader('Set-Cookie', `Auth=${accessToken}`)
         response.end()
     }
 }
 
-function createDate() {
-    let date = new Date()
-    return `${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}`
+// const verify = (token) => {
+//     try {
+//         jwt.verify(token, secretString)
+//         return true
+//     } catch (e) {
+//         return false
+//     }
+// }
+
+const verifyRequest = (cookie, secretString) => {
+    if (!cookie) return false
+
+    const authToken = cookie
+        .split(' ')
+        .find((cookie) => cookie.startsWith('Auth='))
+        .split('Auth=')[1]
+    try {
+        jwt.verify(authToken, secretString)
+        return true
+    } catch (e) {
+        return false
+    }
 }
+// async function tryAuth(response, request) {
+//     const data = authorize_GET(response, request)
+//     console.log(await data())
+//     return
+//     const valid = (await data().json()).valid
+//     return valid
+// }
 
 const blogPost_POST = (response, body, requestURL, request) => {
     const queryStr = urlModule.parse(requestURL, true).query
 
     return async () => {
         const parsedBody = JSON.parse(body)
-        parsedBody.date = createDate()
+        parsedBody.date = new Date().toISOString()
+
+        if (!verifyRequest(request.headers.cookie, secretString)) {
+            response.statusCode = 401
+            return response.end()
+        }
 
         if (queryStr.isPost === 'true') {
+            // const authToken = request.headers.cookie
+            //     .split(' ')
+            //     .find((cookie) => cookie.startsWith('Auth='))
+            //     .split('Auth=')[1]
+
+            // console.log(jwt.verify(authToken, secretString))
             let postURL = parsedBody.title.toLowerCase()
             postURL = postURL.replaceAll(' ', '_')
             postURL = `${postURL}-${parsedBody.date}`
@@ -77,9 +109,14 @@ const blogPost_POST = (response, body, requestURL, request) => {
     }
 }
 
-const blogPost_PUT = (response, body) => {
+const blogPost_PUT = (request, response, body) => {
     return async () => {
         const parsedBody = JSON.parse(body)
+
+        if (!verifyRequest(request.headers.cookie, secretString)) {
+            response.statusCode = 401
+            return response.end()
+        }
 
         await mongoClient
             .db('posts')
@@ -159,7 +196,7 @@ http.createServer((request, response) => {
             const resolver = {
                 blogposts: {
                     POST: blogPost_POST(response, body, request.url, request),
-                    PUT: blogPost_PUT(response, body),
+                    PUT: blogPost_PUT(request, response, body),
                     GET: blogPost_GET(response, request),
                     DELETE: blogPost_DELETE(response),
                 },
@@ -167,7 +204,6 @@ http.createServer((request, response) => {
                     POST: token_POST(response, body),
                 },
             }
-
             await resolver[
                 urlModule.parse(request.url, true).pathname.split('/')[1]
             ][request.method]()

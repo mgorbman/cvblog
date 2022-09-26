@@ -1,7 +1,13 @@
 import MagicalComment from './MagicalComment'
 
-export default function CommentTreeView({ comments, submit }) {
+export default function CommentTreeView({
+    comments: unsortedComments,
+    submit,
+}) {
     const magicalComments = {}
+    const comments = [...unsortedComments]
+    // comments.sort((a, b) => (a > b ? +1 : -1))
+    // console.log(comments)
 
     comments.forEach((c) => {
         if (c.respondingTo) {
@@ -12,12 +18,14 @@ export default function CommentTreeView({ comments, submit }) {
         } else magicalComments[c._id] = []
     })
 
-    console.log(magicalComments)
-
     return (
         <div>
             {comments
                 .filter((c) => !c.respondingTo)
+                // .sort(
+                //     (comment_a, comment_b) =>
+                //         new Date(comment_a.date) - new Date(comment_b.date)
+                // )
                 .map((c) => (
                     <MagicalComment
                         parent={true}
